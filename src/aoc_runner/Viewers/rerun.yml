@@ -1,0 +1,18 @@
+RuntimeLogger:
+  post_load:
+    - view_table
+  on_log:
+    - view
+  pre_exit:
+    - start_viewer
+  on_exit:
+    - view
+  post_exit:
+    - view_table
+AnswerLogger:
+  post_load:
+    - view_table
+  pre_exit:
+    - start_viewer
+  post_exit:
+    - view_table

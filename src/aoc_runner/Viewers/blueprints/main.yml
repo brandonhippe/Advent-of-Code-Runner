@@ -1,0 +1,11 @@
+Blueprint:
+  parts:
+    Tabs:
+      contents:
+        - get_logger_views:
+            bp_dir: True
+      name: "Advent of Code Viewer"
+      active_tab: 
+        get_active_tab: from_logger
+    del_key: True
+  collapse_panels: True

@@ -1,0 +1,4 @@
+TextDocumentView:
+  origin: "/"
+  contents: "$origin/answers"
+  name: "Answers"

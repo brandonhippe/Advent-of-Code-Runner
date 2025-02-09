@@ -1,0 +1,3 @@
+RuntimeLogger: 
+  on_exit:
+    - view

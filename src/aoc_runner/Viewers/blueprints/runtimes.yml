@@ -1,0 +1,36 @@
+Tabs:
+  name: "Runtimes"
+  contents: 
+    - TextDocumentView:
+        origin: "/"
+        contents: "$origin/runtimes"
+        name: "Runtime Overview"
+    - BarChartView: 
+        origin: "/"
+        contents: 
+          - get_languages_list:
+              path_ext: ["tot"]
+        plot_legend:
+          PlotLegend:
+            visible: True
+            corner: "LeftTop"
+        name: "Total Comparison"
+    - BarChartView:
+        origin: "/"
+        contents:
+          - get_languages_list:
+              path_ext: ["avg"]
+        plot_legend:
+          PlotLegend:
+            visible: True
+            corner: "LeftTop"
+        name: "Average Comparison"
+    - Tabs:
+        contents:
+          - get_language_views:
+              path: "lang_runtimes.yml"
+              bp_dir: True
+        name: "By Language"
+        active_tab: 
+          get_active_tab: recent_lang
+  active_tab: 3

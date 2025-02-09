@@ -1,0 +1,47 @@
+Grid:
+  name: ${lang_title}
+  contents:
+    - TimeSeriesView:
+        name: "Part 1"
+        origin: "/${lang}"
+        plot_legend:
+          PlotLegend:
+            visible: True
+            corner: "LeftTop"
+        contents: ["+ $origin/part1/**"]
+        axis_y: 
+          ScalarAxis:
+            range: get_range
+            zoom_lock: True
+    - TimeSeriesView:
+        name: "Part 2"
+        origin: "/${lang}"
+        plot_legend:
+          PlotLegend:
+            visible: True
+            corner: "LeftTop"
+        contents: ["+ $origin/part2/**"]
+        axis_y: 
+          ScalarAxis:
+            range: get_range
+            zoom_lock: True
+    - TimeSeriesView:
+        name: "Combined"
+        origin: "/${lang}"
+        plot_legend:
+          PlotLegend:
+            visible: True
+            corner: "LeftTop"
+        contents: ["+ $origin/**", "- $origin/part1/**", "- $origin/part2/**"]
+        axis_y: 
+          ScalarAxis:
+            range: get_range
+            zoom_lock: True
+    - BarChartView:
+        name: "Total Comparison"
+        origin: "/${lang}"
+        contents: ["+ $origin/avg", "+ $origin/tot"]
+        plot_legend:
+          PlotLegend:
+            visible: True
+            corner: "LeftTop"

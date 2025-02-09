@@ -1,0 +1,31 @@
+{
+    "python.languageServer": "Pylance",
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingModuleSource": "none"
+    },
+    "files.associations": {
+        "*.py": "python",
+    },
+    "python.testing.pytestArgs": [
+        "--doctest-modules", 
+        "--doctest-report", "ndiff",
+    ],
+    "editor.semanticTokenColorCustomizations": {
+        "rules": {
+            "*.mutable": {
+                "fontStyle": "", // set to empty string to disable underline, which is the default
+            },
+        }
+    },
+    "python.testing.pytestEnabled": true,
+    "python.testing.autoTestDiscoverOnSaveEnabled": true,
+    "projectTemplates.templatesDirectory": "${workspaceFolder}/.vscode/templates",          // default directory containing project templates
+    "projectTemplates.usePlaceholders": true,           // activate placeholder substitution
+    "projectTemplates.placeholders": {  },              // dictionary of default placeholder key-value pairs
+    "projectTemplates.placeholderRegExp": "#{(\\w+?)}",
+    "files.watcherExclude": {
+        "**/target": true
+    },
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.autoImportCompletions": true // regular expression to use for detecting placeholders
+}
