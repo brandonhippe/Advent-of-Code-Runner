@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
+import numpy as np
 import rerun as rr
 
 from ..Languages import Language, get_released
@@ -268,8 +269,8 @@ class RerunViewer(Viewer):
             rr.disable_timeline(seq_str, recording=self.active_recording.recording)
             rr.send_columns(
                 log_name,
-                times=[rr.TimeSequenceColumn(seq_str, seq)],
-                components=[rr.components.ScalarBatch(data)],
+                indexes=[rr.TimeSequenceColumn(seq_str, seq)],
+                columns=[rr.components.ScalarBatch(data)],
                 recording=self.active_recording.recording,
             )
         else:
@@ -328,7 +329,7 @@ class RerunViewer(Viewer):
             self.clear_log(entity_path)
         rr.log(
             log_name,
-            rr.BarChart(data),
+            rr.BarChart(np.asarray(data)),
             extras,
             recording=self.active_recording.recording,
         )
