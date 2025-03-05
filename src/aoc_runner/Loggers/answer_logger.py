@@ -17,7 +17,7 @@ from PIL import Image, ImageDraw
 
 from .. import BASE_DIR
 from ..Languages import LANGS, Language, get_released
-from ..web import AOC_COOKIE, get_answers, submit_answer
+from ..web import AOC_COOKIE, submit_answer
 from . import Logger, LoggerAction, DataTracker
 
 
@@ -192,13 +192,6 @@ class AnswerLogger(Logger):
                     for i, ans in filter(lambda ans: len(ans[1]), enumerate(v.split(";"), 1))
                 }
 
-        # for year in get_released():
-        #     for day in get_released(year):
-        #         if any((year, day, i) not in self.correct_answers for i in ([1] if day == 25 else [1, 2])):
-        #             for part, ans in get_answers(year, day).items():
-        #                 self.correct_answers[(year, day, part)] = ans
-        #                 self.correct_changed = True
-
         super().__enter__()
         self.changed_data = AnswerTracker(False)
         return self
@@ -318,7 +311,7 @@ class AnswerLogger(Logger):
             year, day, part, lang, ans=ans
         )
 
-        if (year, day, part) not in self.correct_answers:
+        if (year, day, part) not in self.correct_answers and (day, part) != (25, 2):
             if submit_answer(year, day, part, ans):
                 self.correct_answers[(year, day, part)] = ans
                 self.correct_changed = True
