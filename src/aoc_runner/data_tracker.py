@@ -113,9 +113,9 @@ class DataTracker(ABC):
             for row, kwargs in rows:
                 out_tables[tab_name].add_row(row, **kwargs)
 
-        style = vars(TableStyle).get(style)
+        tab_style = vars(TableStyle).get(style)
         for table in out_tables.values():
-            table.set_style(style)
+            table.set_style(tab_style)
 
         # Get printing order of tables
         year_filter = lambda x: inv ^ x.isnumeric()
