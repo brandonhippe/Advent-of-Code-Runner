@@ -141,17 +141,15 @@ class AnswerLogger(Logger):
     Answer logger for Advent of Code
     """
 
-    data: AnswerTracker = field(default_factory=AnswerTracker)
-    incorrect: AnswerTracker= field(default_factory=lambda: AnswerTracker(False))
     name: str = "answers"
-    data_start: int = 2
     value_key: str = "ans"
+    data: AnswerTracker = field(default_factory=AnswerTracker)
+    correct: AnswerTracker = field(default_factory=lambda: AnswerTracker(print_this=False))
+    incorrect: AnswerTracker = field(default_factory=lambda: AnswerTracker(dump_this=False))
+    changed_data: AnswerTracker = field(default_factory=lambda: AnswerTracker(dump_this=False))
+    data_start: int = 2
     table_style: str = "DOUBLE_BORDER"
-    correct_answers: Dict[Tuple[int, int, int], str] = field(default_factory=dict)
-    correct_changed: bool = False
-    # correct_answers_path = Path(Path(__file__).parent, "correct_answers", f"{AOC_COOKIE}_answers.txt")
-    correct_answers_path = Path(BASE_DIR, "correct_answers", f"{AOC_COOKIE}_answers.txt")
-    data_prefix: str = AOC_COOKIE
+    data_prefix: str = str(Path("Inputs", AOC_COOKIE))
 
     @staticmethod
     def add_arguments(parser: argparse.ArgumentParser) -> None:
@@ -177,38 +175,6 @@ class AnswerLogger(Logger):
         parser.add_argument(
             "--answers-table-style", type=str, choices=["DEFAULT", "SINGLE_BORDER", "DOUBLE_BORDER"], help="Style of the answer table"
         )
-
-    ### Context manager functions
-    def __enter__(self):
-        # Load correct answers
-        if os.path.exists(self.correct_answers_path):
-            with open(
-                self.correct_answers_path, "r", encoding="utf-8"
-            ) as f:
-                self.correct_answers = {
-                    tuple([*map(int, k.split("-")), i]): ans
-                    for line in f.readlines()
-                    for k, v in [line.strip().split(": ")]
-                    for i, ans in filter(lambda ans: len(ans[1]), enumerate(v.split(";"), 1))
-                }
-
-        super().__enter__()
-        self.changed_data = AnswerTracker(False)
-        return self
-    
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
-        if super().__exit__(exc_type, exc_val, exc_tb):
-            if self.correct_changed:
-                self.correct_answers_path.parent.mkdir(parents=True, exist_ok=True)
-                with open(
-                    Path(self.correct_answers_path), "w", encoding="utf-8"
-                ) as f:
-                    for year in get_released():
-                        for day in get_released(year):
-                            answers = f"{self.correct_answers.get((year, day, 1), ' ')};{self.correct_answers.get((year, day, 2), ' ')}"
-                            f.write(f"{year}-{day}: {answers}\n")
-        
-        return not bool(exc_type)
 
     def log(self, *args, **kwargs) -> None:
         """
@@ -300,7 +266,7 @@ class AnswerLogger(Logger):
 
         incorrect = False
         self.data.add_data((lang, year, day, part), new_data=ans)
-        if (ans := self.data[lang, year, day, part]) != self.correct_answers.get((year, day, part), ans) and ans != "":
+        if (day, part) != (25, 2) and (ans := self.data[lang, year, day, part]) != self.correct[year, day, part] and ans != "":
             self.data.add_data((lang, year, day, part), new_data=ans, incorrect=True)
             incorrect = True
 
@@ -310,10 +276,10 @@ class AnswerLogger(Logger):
         self.add_new_data(
             year, day, part, lang, ans=ans
         )
-
-        if (year, day, part) not in self.correct_answers and (day, part) != (25, 2):
+        
+        if (year, day, part) not in self.correct and (day, part) != (25, 2):
             if submit_answer(year, day, part, ans):
-                self.correct_answers[(year, day, part)] = ans
+                self.correct.add_data((year, day, part), new_data=ans)
                 self.correct_changed = True
 
     def get_incorrect(self, new_only: bool = False) -> Dict[Tuple[Any,], str]:
@@ -323,7 +289,7 @@ class AnswerLogger(Logger):
         incorrect = {}
         for year, day in self.runtime_days(new_only):
             for lang in filter(lambda l: l in self.data, LANGS):
-                for part, correct in enumerate(self.correct_answers[(year, day)], 1):
+                for part, correct in self.correct[year, day].items():
                     if (day, part) == (25, 2):
                         continue
 

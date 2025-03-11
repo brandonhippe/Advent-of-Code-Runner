@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from ast import dump
 from collections import defaultdict
 from dataclasses import dataclass, field
 from functools import reduce
@@ -14,34 +15,39 @@ class DataTracker(ABC):
     Tracker for AOC Data
     """
     dump_this: bool = True
+    print_this: bool = True
     data: Dict[Hashable, Any] = field(default_factory=dict)
 
-    def add_data(self, key: Tuple[Hashable], *args, new_data: Any, **kwargs) -> None:
-        """
-        Add data to the tracker
-        """
-        if not isinstance(key, list):
-            key = list(key)
-        key += [*args]
-
-        k = key[0]
-        if len(key) == 1:
-            self.data[k] = new_data
-        else:
-            if k not in self.data:
-                self.data[k] = type(self)()
-            self.data[k].add_data(key[1:], new_data=new_data)
-        self.update()
-
-    def __getitem__(
-        self, key: Hashable | List[Hashable], *args
-    ) -> Any:
+    def conv_key(self, key: Tuple[Hashable], *args) -> List[Hashable]:
         if not isinstance(key, list):
             if isinstance(key, Iterable):
                 key = list(key)
             else:
                 key = [key]
         key += [*args]
+        return key
+
+
+    def add_data(self, key: Tuple[Hashable], *args, new_data: Any, **kwargs) -> None:
+        """
+        Add data to the tracker
+        """
+        key = self.conv_key(key, *args)
+
+        k = key[0]
+        if len(key) == 1:
+            self.data[k] = new_data
+        else:
+            if k not in self.data:
+                self.data[k] = type(self)(dump_this=self.dump_this, print_this=self.print_this)
+            self.data[k].add_data(key[1:], new_data=new_data)
+
+        self.update()
+
+    def __getitem__(
+        self, key: Hashable | List[Hashable], *args
+    ) -> Any:
+        key = self.conv_key(key, *args)
 
         if len(key) == 1:
             return self.data[key[0]]
@@ -51,9 +57,7 @@ class DataTracker(ABC):
     def __contains__(
         self, key: Hashable | List[Hashable], *args
     ) -> bool:
-        if not isinstance(key, list):
-            key = list(key)
-        key += [*args]
+        key = self.conv_key(key, *args)
 
         if len(key) == 1:
             return key[0] in self.data
@@ -74,6 +78,9 @@ class DataTracker(ABC):
         """
         Get tables from the DataTracker
         """
+        if not self.print_this:
+            return ""
+
         use_divider = style in ["DEFAULT", "SINGLE_BORDER"]
         use_divider = style not in ["MARKDOWN", "DOUBLE_BORDER"]
         logger_name = kwargs.get("logger_name", "data")
@@ -104,6 +111,9 @@ class DataTracker(ABC):
             rows = []
             for row_indecies, row_data in sorted(table_data.items(), key=lambda x: tuple((len(x[0][i]), x[0][i]) if len(x[0]) > i else (0, "") for i in range(max_row_indecies))):
                 reduced_row_indecies = [index if (not reduce_row_indecies or i >= len(p_row_indecies) or index != p_row_indecies[i]) else "" for i, index in enumerate(row_indecies[row_ix_slice])]
+                if not reduced_row_indecies:
+                    continue
+                
                 if not no_dividers and p_row_indecies and reduced_row_indecies[0]:
                     rows[-1][-1]["divider"] = use_divider
 
@@ -159,7 +169,7 @@ class DataTracker(ABC):
         def dict_to_table(d: Dict[Hashable, Any]):
             for k, v in sorted(d.items(), key=lambda x: str(x[0])):
                 # Skip certain keys
-                if k in ["dump_this"]:
+                if k in ["dump_this", "print_this"]:
                     continue
 
                 # Turn into table by type

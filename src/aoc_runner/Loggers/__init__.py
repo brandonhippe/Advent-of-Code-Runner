@@ -55,8 +55,7 @@ class Logger(ABC):
         self.started = True
         if isinstance(self.args, argparse.Namespace):
             self.verbose = vars(self.args).get("verbose", False)
-            # self.data_yaml_path = Path(Path(__file__).parent, "_".join(filter(None, (self.name, self.data_prefix, "data.yml"))))
-            self.data_yaml_path = Path(BASE_DIR, "_".join(filter(None, (self.name, self.data_prefix, "data.yml"))))
+            self.data_yaml_path = Path(*tuple(filter(None, (BASE_DIR, self.data_prefix, f"{self.name}_data.yml"))))
 
     def __hash__(self):
         return hash(self.name)
@@ -133,11 +132,15 @@ class Logger(ABC):
                 data[year][day] = data[year].get(day, {})
 
                 for part in [1, 2]:
-                    for lang in filter(lambda l: [l, year, day, part] in tracker, LANGS):
-                        data[year][day][part] = data[year][day].get(part, {})
-                        data[year][day][part][str(lang)] = tracker[
-                            lang, year, day, part
-                        ]
+                    if tracker.print_this:
+                        for lang in filter(lambda l: [l, year, day, part] in tracker, LANGS):
+                            data[year][day][part] = data[year][day].get(part, {})
+                            data[year][day][part][str(lang)] = tracker[
+                                lang, year, day, part
+                            ]
+                    elif [year, day, part] in tracker:
+                        data[year][day][part] = tracker[year, day, part]
+
 
             dumping[name] = data
 
@@ -160,12 +163,19 @@ class Logger(ABC):
         """
         Load logger data
         """
-        def log_dict(d: dict, value_key: str, keys: List[Any] = []) -> None:
+        def load_dict(tracker: DataTracker, d: dict, value_key: str, keys: List[Any] = []) -> dict:
             for k, v in d.items():
                 if isinstance(v, dict):
-                    log_dict(v, value_key, keys + [k])
-                elif k.title() in LANGS and len(keys) == 3:
-                    LANGS[k.title()].add_part(*keys, **{value_key: v}, loggers=[self], event="on_load")
+                    load_dict(tracker, v, value_key, keys + [k])
+                elif len(keys) == 3:
+                    if k.title() in LANGS:
+                        LANGS[k.title()].add_part(*keys, **{value_key: v}, loggers=[self], event="on_load")
+                    else:
+                        tracker.add_data([k, *keys], new_data={value_key: v})
+                elif len(keys) == 2:
+                    tracker.add_data([*keys, k], new_data=v)
+                else:
+                    raise NotImplementedError
 
 
         if vars(self.args).get("no_load", False) or not os.path.exists(self.data_yaml_path):
@@ -175,8 +185,8 @@ class Logger(ABC):
 
         with open(self.data_yaml_path, "r") as f:
             if data := yaml.safe_load(f):
-                for v in data.values():
-                    log_dict(v, self.value_key)
+                for k, v in data.items():
+                    load_dict(vars(self)[k], v, self.value_key)
 
         self.print("Data loaded")
         self.print(self.data(["Language", "Year", "Day", "Part"], style=self.table_style))
