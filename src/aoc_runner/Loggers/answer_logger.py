@@ -5,7 +5,6 @@ Answer logger for Advent of Code
 import argparse
 from collections import defaultdict
 from dataclasses import dataclass, field
-import os
 from pathlib import Path
 from typing import Any, Dict, Hashable, List, Optional, Tuple
 
@@ -15,8 +14,7 @@ import pytesseract
 from advent_of_code_ocr import convert_6
 from PIL import Image, ImageDraw
 
-from .. import BASE_DIR
-from ..Languages import LANGS, Language, get_released
+from ..Languages import LANGS, Language 
 from ..web import AOC_COOKIE, submit_answer
 from . import Logger, LoggerAction, DataTracker
 
@@ -281,24 +279,3 @@ class AnswerLogger(Logger):
             if submit_answer(year, day, part, ans):
                 self.correct.add_data((year, day, part), new_data=ans)
                 self.correct_changed = True
-
-    def get_incorrect(self, new_only: bool = False) -> Dict[Tuple[Any,], str]:
-        """
-        Get incorrect answers
-        """
-        incorrect = {}
-        for year, day in self.runtime_days(new_only):
-            for lang in filter(lambda l: l in self.data, LANGS):
-                for part, correct in self.correct[year, day].items():
-                    if (day, part) == (25, 2):
-                        continue
-
-                    if [year, day, part] in self.data[
-                        lang
-                    ] and self.data[lang, year, day, part] != correct:
-                        incorrect[(year, day, part, lang)] = (
-                            correct,
-                            self.data[(lang, year, day, part)],
-                        )
-
-        return incorrect

@@ -107,10 +107,10 @@ class Viewer(ABC):
             with open(fpath, "r") as f:
                 viewer_config = yaml.safe_load(f)
 
-            for logger_name, to_attach in viewer_config.items():
-                if logger_name not in LOGGERS or not getattr(
-                    LOGGERS[logger_name], "started", False
-                ):
+            logger_check = lambda item: item[0] in LOGGERS
+
+            for logger_name, to_attach in filter(logger_check, viewer_config.items()):
+                if not getattr(LOGGERS[logger_name], "started", False):
                     continue
 
                 for event, to_call in to_attach.items():
@@ -120,6 +120,18 @@ class Viewer(ABC):
                         if func not in callables:
                             callables.append(func)
                     setattr(LOGGERS[logger_name], event, callables)
+
+            self.configure_viewer(dict(filter(lambda i: not logger_check(i), viewer_config.items())))
+
+    def configure_viewer(self, viewer_config: Dict[str, Any]) -> None:
+        """
+        Configure the viewer with the provided config
+        """
+        for var_name, val in viewer_config.items():
+            if hasattr(self, var_name):
+                setattr(self, var_name, val)
+            else:
+                raise ValueError(f"{self.name} viewer has no attribute {var_name}")
 
     def view(self, *args, from_logger: Optional[Logger] = None, **kwargs):
         """

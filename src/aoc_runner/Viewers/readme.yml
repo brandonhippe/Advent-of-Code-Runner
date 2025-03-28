@@ -1,0 +1,7 @@
+AnswerLogger:
+  post_exit:
+    - write
+template_paths:
+  overall: readme_templates/overall.md
+  year: readme_templates/year.md
+  language: readme_templates/language.md
