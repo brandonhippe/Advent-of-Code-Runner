@@ -9,10 +9,10 @@ def main():
     with open(pyproj, "r") as f:
         pyproj_text = f.read()
 
-    reqs_text = subprocess.run(["python3", "-m", "pip", "freeze"], capture_output=True, text=True).stdout
+    reqs_text = subprocess.run(["python", "-m", "pip", "freeze", "-l", "--exclude-editable"], capture_output=True, text=True).stdout
     deps_regex = re.compile(r"dependencies = \[.*?\]", flags=re.DOTALL | re.MULTILINE)
 
-    new_deps = map(lambda x: f'\t"{x}"', reqs_text)
+    new_deps = map(lambda x: f'\t"{x}"', reqs_text.splitlines())
     new_deps = "dependencies = [\n" + ",\n".join(new_deps) + "\n]"
 
     if deps_regex.search(pyproj_text):
