@@ -1,0 +1,3 @@
+[submodule "src/aoc_runner/Viewers/aoc-tiles"]
+	path = src/aoc_runner/Viewers/aoc-tiles
+	url = https://github.com/brandonhippe/aoc_runner_tiles.git
