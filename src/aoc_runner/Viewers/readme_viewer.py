@@ -99,14 +99,14 @@ class ReadmeViewer(Viewer):
                 lang_title = str(lang).title()
                 self.print(f"Writing {lang_title} README")
                 with open(Path(os.getcwd(), str(year), str(lang), "README.md"), "w") as f:
-                    f.write(self.fill_in_template(self.templates["language"], **vars()))
+                    f.write(self.fill_in_template(self.templates["language"], **dict(filter(lambda item: item[0] != 'self', locals().items()))))
             
             with open(Path(os.getcwd(), str(year), "README.md"), "w") as f:
-                f.write(self.fill_in_template(self.templates["year"], **vars()))
+                f.write(self.fill_in_template(self.templates["year"], **dict(filter(lambda item: item[0] != 'self', locals().items()))))
 
         self.print("Writing top-level README")
         with open(Path(os.getcwd(), "README.md"), "w") as f:
-            f.write(self.fill_in_template(self.templates["overall"], **vars()))
+            f.write(self.fill_in_template(self.templates["overall"], **dict(filter(lambda item: item[0] != 'self', locals().items()))))
 
     ### Other Helper Functions
     def fill_in_template(self, template: str, **kwargs) -> str:
@@ -115,6 +115,7 @@ class ReadmeViewer(Viewer):
 
         Looks for the key in the arguments, variables, and global functions, in that order.
         """
+        vars().update(kwargs)
         filled_in = template[:]
         match_regex = re.compile(r"(?P<replace>#{\((?P<parameter_name>\w+?)\)})")
 
@@ -129,6 +130,12 @@ class ReadmeViewer(Viewer):
                     replace_with = getattr(self, parameter_name)()
                 else:
                     replace_with = str(getattr(self, parameter_name))
+            elif parameter_name in locals():
+                # Key is a variable or function in this function
+                if callable(locals()[parameter_name]):
+                    replace_with = locals()[parameter_name]()
+                else:
+                    replace_with = str(locals()[parameter_name])
             else:
                 # This will raise an error if the key is not a defined variable or a function in the global scope
                 try:
@@ -154,10 +161,10 @@ class ReadmeViewer(Viewer):
         replaced = context.replace(replace_str, replace_with, 1)
         return template.replace(context, replaced, 1)
 
-def git_username(self, *args, **kwargs) -> str:
+def git_username(*args, **kwargs) -> str:
     return re.search(r"user\.name=(.+)", subprocess.run(["git", "config", "--list"], capture_output=True, text=True).stdout).group(1).strip()
 
-def submod_repos(self, *args, **kwargs) -> str:
+def submod_repos(*args, **kwargs) -> str:
     submod_text = subprocess.run(["git", "submodule"], capture_output=True, text=True).stdout
     md_out = ""
     for m in re.finditer(r"\b.* (\d+) \(.*\)", submod_text):
