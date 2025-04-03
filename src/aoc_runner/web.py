@@ -15,27 +15,39 @@ load_dotenv(Path(os.getcwd(), ".env"))
 AOC_COOKIE = os.getenv("AOC_COOKIE", "")
 assert AOC_COOKIE, "No AOC_COOKIE found in environment variables"
 
+CACHE_DIR = Path(os.getenv("CACHE_DIR", Path(os.getcwd(), "__cache__")))
 
-def get_from_url(url: str, data: Optional[Dict]=None, soup: bool=True, **kwargs) -> BeautifulSoup:
+
+def get_from_url(url: str, data: Optional[Dict]=None, **kwargs) -> BeautifulSoup:
     """
     Get the content of a given URL
     """
+    if Path(CACHE_DIR, AOC_COOKIE, url.replace("https://", "").replace("/", "_")).exists():
+        with open(Path(CACHE_DIR, AOC_COOKIE, url.replace("https://", "").replace("/", "_")), "r") as f:
+            return BeautifulSoup(f.read(), 'html.parser')
+    
     if data:
-        response = requests.post(url, cookies={"session": AOC_COOKIE}, data=data, timeout=5)
+        response = requests.post(url, cookies={"session": AOC_COOKIE}, data=data, timeout=0.5)
     else:
-        response = requests.get(url, cookies={"session": AOC_COOKIE}, timeout=5)
+        response = requests.get(url, cookies={"session": AOC_COOKIE}, timeout=0.5)
 
-    if response.status_code == 200:
-        return BeautifulSoup(response.content, 'html.parser') if soup else response
-    else:
+    if response.status_code != 200:
         raise FileNotFoundError(f"Error: {response.status_code} for {url=}")
+    
+    response = BeautifulSoup(response.content, 'html.parser')
+
+    os.makedirs(Path(CACHE_DIR, AOC_COOKIE), exist_ok=True)
+    with open(Path(CACHE_DIR, AOC_COOKIE, url.replace("https://", "").replace("/", "_")), "w") as f:
+        f.write(str(response))
+
+    return response
 
 
 def get_input(year: int, day: int, *args, **kwargs) -> str:
     """
     Get the input for a given year and day from the Advent of Code website
     """
-    return get_from_url(f"https://adventofcode.com/{year}/day/{day}/input", soup=False).text
+    return get_from_url(f"https://adventofcode.com/{year}/day/{day}/input").text
 
 
 def get_answers(year: int, day: int, *args, **kwargs) -> Dict[int, str]:
@@ -56,3 +68,10 @@ def submit_answer(year: int, day: int, part: int, ans: str, *args, **kwargs) -> 
     """
     soup = get_from_url(f"https://adventofcode.com/{year}/day/{day}/answer", data={"level": part, "answer": ans}).text
     return re.search(r"That's the right answer", soup) or re.search(r"You don't seem to be solving the right level", soup)
+
+def get_leaderboard(year: int, *args, **kwargs) -> str:
+    """
+    Get the leaderboard for a given year from the Advent of Code website
+    """
+    soup = get_from_url(f"https://adventofcode.com/{year}/leaderboard/self")
+    return str(soup)

@@ -1,4 +1,7 @@
 AnswerLogger:
+  pre_exit:
+    - copy_incorrect
+RuntimeLogger:
   post_exit:
     - write
 template_paths:
