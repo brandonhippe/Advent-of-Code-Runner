@@ -73,10 +73,5 @@ def get_leaderboard(year: int, *args, **kwargs) -> str:
     """
     Get the leaderboard for a given year from the Advent of Code website
     """
-    global AOC_COOKIE
-    
-    p_cookie = AOC_COOKIE
-    AOC_COOKIE = "53616c7465645f5f5c9bcd9e5ab0699b57e37370ec5a920d05bd2b3eebc84faeecd220f9e66fe0c94eb50b8dc005df1af99a7610850827302d776cd206d79023"
     soup = get_from_url(f"https://adventofcode.com/{year}/leaderboard/self")
-    AOC_COOKIE = p_cookie
     return str(soup)
