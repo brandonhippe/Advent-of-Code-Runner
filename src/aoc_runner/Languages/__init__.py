@@ -228,6 +228,14 @@ class Language(ABC):
         Is a relative path to the parent directory.
         """
         return Path(f"{day}{'.exe' if platform.system() == 'Windows' else ''}")
+    
+    def code_file(self, year: int, day: int) -> Path:
+        """
+        Get the path to the code file for the given year and day.
+        """
+        if self.folder:
+            return Path(self.parent_dir(year, day), "src", f"main{self.ext}")
+        return Path(self.parent_dir(year, day), f"{day}{self.ext}")
 
     @abstractmethod
     def parent_dir(self, year: int, day: int) -> Path:

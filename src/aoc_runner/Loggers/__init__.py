@@ -204,7 +204,8 @@ class Logger(ABC):
         self.print("Saving data")
         self.print(self.data(["Language", "Year", "Day", "Part"], style=self.table_style))
 
-        with open(self.data_yaml_path, "w") as f:
+        os.makedirs(self.data_yaml_path.parent, exist_ok=True)
+        with open(self.data_yaml_path, "w+") as f:
             yaml.safe_dump(self(), f)
 
         self.print("Data saved")
