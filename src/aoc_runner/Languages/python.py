@@ -28,7 +28,12 @@ class Python(Language):
         os.chdir(pardir)
 
         if verbose:
-            print('\n' + os.get_terminal_size().columns * "-")
+            try:
+                term_width = os.get_terminal_size().columns
+            except OSError:
+                term_width = 80
+
+            print('\n' + term_width * "-")
             print(f"{self.lang.title()} {year} day {day} output:", end="")
 
         (p1, p1_elapsed), (p2, p2_elapsed) = code.main(input_path=self.input_loc(year, day), verbose=verbose)

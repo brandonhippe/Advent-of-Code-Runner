@@ -137,7 +137,12 @@ class Language(ABC):
         output = output[output_start:]
 
         if verbose:
-            print(os.get_terminal_size().columns * "-")
+            try:
+                term_width = os.get_terminal_size().columns
+            except OSError:
+                term_width = 80
+    
+            print(term_width * "-")
             print(f"{self.lang.title()} {year} day {day} output:", end="")
             print("\n".join(output))
 
