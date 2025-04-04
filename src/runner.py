@@ -3,6 +3,8 @@ import os
 from itertools import product
 from typing import Dict, List, Tuple
 
+from numpy import var
+
 from aoc_runner import (LANGS, Language, RunnerHandler, add_arguments,
                         get_released)
 
@@ -180,7 +182,10 @@ def main():
     if len(year_days) == 0:
         raise ValueError("No valid years/days for the given languages")
 
-    progressBar = (not vars(args).get("no_progress_bar", False)) and (not vars(args).get("verbose", False) and len(year_days) > 1)
+    if vars(args).get("no_progress_bar", False):
+        progressBar = False
+    else:
+        progressBar = not vars(args).get("verbose", False) and len(year_days) > 1
 
     if common:
         for s in [set(lang.discover()) for lang in languages.values()]:
