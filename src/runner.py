@@ -157,7 +157,7 @@ def aoc_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "--no-progress-bar",
+        "--no-progressbar",
         action="store_true",
         help="Disable progress bar. Default: False",
     )
@@ -182,7 +182,8 @@ def main():
     if len(year_days) == 0:
         raise ValueError("No valid years/days for the given languages")
 
-    if vars(args).get("no_progress_bar", False):
+    if vars(args).get("no_progressbar", False):
+        print("Progress bar disabled")
         progressBar = False
     else:
         progressBar = not vars(args).get("verbose", False) and len(year_days) > 1
