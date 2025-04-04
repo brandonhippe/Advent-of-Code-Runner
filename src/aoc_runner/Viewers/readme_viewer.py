@@ -240,9 +240,8 @@ class ReadmeViewer(Viewer):
             return ""
         
         lang_list = []
-        for lang in LANGS:
-            if year in from_logger.data[lang]:
-                lang_list.append(lang)
+        for lang in filter(lambda l: [l, year] in from_logger.data, LANGS):
+            lang_list.append(lang)
 
         return "\n".join([f" - [{str(lang).title()}]({lang}/README.md)" for lang in lang_list])
 

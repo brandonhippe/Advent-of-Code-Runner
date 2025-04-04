@@ -15,7 +15,7 @@ from advent_of_code_ocr import convert_6
 from PIL import Image, ImageDraw
 
 from ..Languages import LANGS, Language 
-from ..web import AOC_COOKIE, submit_answer
+from ..web import AOC_COOKIE, get_answers, submit_answer
 from . import Logger, LoggerAction, DataTracker
 
 
@@ -264,9 +264,20 @@ class AnswerLogger(Logger):
 
         incorrect = False
         self.data.add_data((lang, year, day, part), new_data=ans)
-        if (day, part) != (25, 2) and (ans := self.data[lang, year, day, part]) != self.correct[year, day, part] and ans != "":
-            self.data.add_data((lang, year, day, part), new_data=ans, incorrect=True)
-            incorrect = True
+        
+        if (day, part) != (25, 2) and ans != "":
+            if (year, day, part) not in self.correct and (day, part) != (25, 2):
+                new_answers = get_answers(year, day)
+                
+                if part in new_answers or submit_answer(year, day, part, ans):
+                    self.correct.add_data((year, day, part), new_data=ans)
+                    self.correct_changed = True
+                else:
+                    self.data.add_data((lang, year, day, part), new_data=ans, incorrect=True)
+                    incorrect = True
+            elif ans != self.correct[year, day, part]:
+                self.data.add_data((lang, year, day, part), new_data=ans, incorrect=True)
+                incorrect = True
 
         if event == "on_log":
             self.changed_data.add_data((lang, year, day, part), new_data=ans, incorrect=incorrect)
@@ -274,8 +285,3 @@ class AnswerLogger(Logger):
         self.add_new_data(
             year, day, part, lang, ans=ans
         )
-        
-        if (year, day, part) not in self.correct and (day, part) != (25, 2):
-            if submit_answer(year, day, part, ans):
-                self.correct.add_data((year, day, part), new_data=ans)
-                self.correct_changed = True
