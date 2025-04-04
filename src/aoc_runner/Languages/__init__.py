@@ -186,9 +186,9 @@ class Language(ABC):
         Discover all files for the given language.
         """
         if self.folder:
-            filename_regex = re.compile(f"^(\d+)$")
+            filename_regex = re.compile(rf"^(\d+)$")
         else:
-            filename_regex = re.compile(f"^(\d+){self.ext}$")
+            filename_regex = re.compile(rf"^(\d+){self.ext}$")
 
         scripts = []
         for year in get_released():

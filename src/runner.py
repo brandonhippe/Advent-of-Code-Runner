@@ -154,6 +154,12 @@ def aoc_parser() -> argparse.ArgumentParser:
         "--verbose", action="store_true", help="Print verbose output. Default: False"
     )
 
+    parser.add_argument(
+        "--no-progress-bar",
+        action="store_true",
+        help="Disable progress bar. Default: False",
+    )
+
     add_arguments(parser)
     return parser
 
@@ -174,7 +180,7 @@ def main():
     if len(year_days) == 0:
         raise ValueError("No valid years/days for the given languages")
 
-    progressBar = not vars(args).get("verbose", False) and len(year_days) > 1
+    progressBar = (not vars(args).get("no_progress_bar", False)) and (not vars(args).get("verbose", False) and len(year_days) > 1)
 
     if common:
         for s in [set(lang.discover()) for lang in languages.values()]:
