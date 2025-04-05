@@ -19,6 +19,13 @@ jobs:
         with:
           submodules: recursive
           ref: ${{ inputs.ref }}
+      
+      # Debugging step to list branches and tags
+      - name: List branches and tags
+        run: |
+          git fetch --all
+          git branch -a
+          git tag
 
       # Set up Python environment
       - uses: actions/setup-python@v5
