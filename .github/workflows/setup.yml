@@ -19,7 +19,7 @@ jobs:
         with:
           repository: brandonhippe/Advent-of-Code-Runner
           submodules: recursive
-          path: ../runner
+          path: runner
           ref: ${{ inputs.release }}
 
       # Set up Python environment
@@ -33,4 +33,4 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt install tesseract-ocr libtesseract-dev
-          cd ../runner && python -m pip install -e . && cd ${{ github.workspace }}
+          cd runner && python -m pip install -e . && cd ${{ github.workspace }}
