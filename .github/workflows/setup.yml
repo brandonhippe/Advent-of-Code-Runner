@@ -39,4 +39,4 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y tesseract-ocr libtesseract-dev
           cd runner && python -m pip install -e . && cd ${{ github.workspace }}
-          echo "::set-output name=runner-path::${{ github.workspace }}/runner"
+          echo "runner-path=${{ github.workspace }}/runner" >> $GITHUB_ENV
