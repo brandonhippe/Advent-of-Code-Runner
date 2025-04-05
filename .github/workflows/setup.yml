@@ -1,0 +1,34 @@
+name: Advent of Code Runner Setup
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    defaults:
+        run:
+          shell: bash
+    steps:
+      # Checkout the repository with submodules
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ref: ${{ inputs.ref }}
+
+      # Set up Python environment
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip' # caching pip dependencies
+
+      # Install dependencies for the runner submodule & submodules
+      - name: setup
+        run: |
+          sudo apt-get update
+          sudo apt install tesseract-ocr libtesseract-dev
+          python -m pip install -e .
