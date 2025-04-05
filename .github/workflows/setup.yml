@@ -3,7 +3,7 @@ name: Advent of Code Runner Setup
 on:
   workflow_call:
     inputs:
-      ref:
+      release:
         required: true
         type: string
 
@@ -18,14 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-          ref: ${{ inputs.ref }}
-      
-      # Debugging step to list branches and tags
-      - name: List branches and tags
-        run: |
-          git fetch --all
-          git branch -a
-          git tag
+          ref: ${{ inputs.release }}
 
       # Set up Python environment
       - uses: actions/setup-python@v5
