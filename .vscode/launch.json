@@ -10,7 +10,8 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "cwd":"${workspaceFolder}/${relativeFileDirname}",
+            "cwd":"/home/brandonhippe/Advent-of-Code",
+            "args": ["-r", "-a", "--readme", "-l", "rust"]
         },
     ]
 }
