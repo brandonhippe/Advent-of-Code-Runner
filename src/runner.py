@@ -63,7 +63,7 @@ def run(
 
         it = iter(year_days)
         if progressBar:
-            it = tqdm(it, total=len(year_days), unit="year-day", ncols=os.get_terminal_size().columns)
+            it = tqdm(it, total=len(year_days), unit="day", ncols=os.get_terminal_size().columns)
 
         for year, day in it:
             for _, t in lang.run(year, day, not progressBar, loggers=loggers):
