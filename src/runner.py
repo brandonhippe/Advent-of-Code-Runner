@@ -3,37 +3,10 @@ import os
 from itertools import product
 from typing import Dict, List, Tuple
 
-from numpy import var
+from tqdm import tqdm
 
 from aoc_runner import (LANGS, Language, RunnerHandler, add_arguments,
                         get_released)
-
-
-def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd="\r"):
-    """
-    Call in a loop to create terminal progress bar
-    @params:
-        iteration   - Required  : current iteration (Int)
-        total       - Required  : total iterations (Int)
-        prefix      - Optional  : prefix string (Str)
-        suffix      - Optional  : suffix string (Str)
-        decimals    - Optional  : positive number of decimals in percent complete (Int)
-        length      - Optional  : character length of bar (Int)
-        fill        - Optional  : bar fill character (Str)
-        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
-    """
-    try:
-        term_width = os.get_terminal_size().columns
-    except OSError:
-        term_width = 80
-    length = term_width - 10
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filledLength = int(length * iteration // total)
-    bar = fill * filledLength + '-' * (length - filledLength)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
-    # Print New Line on Complete
-    if iteration == total: 
-        print()
 
 
 def contiguous_groups(l: List[int]) -> List[Tuple[int, int]]:
@@ -88,15 +61,13 @@ def run(
 
         print(f"Running {language}...")
 
-        for i, (year, day) in enumerate(year_days):
-            if progressBar and i == 0:
-                printProgressBar(i, len(year_days))
+        it = iter(year_days)
+        if progressBar:
+            it = tqdm(it, total=len(year_days), unit="year-day", ncols=os.get_terminal_size().columns)
 
+        for year, day in it:
             for _, t in lang.run(year, day, not progressBar, loggers=loggers):
                 totalTime += t
-
-            if progressBar:
-                printProgressBar(i + 1, len(year_days))
 
         print(f"\n{language}: Total time: {totalTime:.4f} seconds\n\n")
 

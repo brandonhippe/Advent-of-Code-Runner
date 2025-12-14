@@ -52,6 +52,7 @@ dependencies = [
 	"six==1.17.0",
 	"smmap==5.0.1",
 	"soupsieve==2.6",
+	"tqdm==4.67.1",
 	"typing_extensions==4.12.2",
 	"urllib3==2.2.2",
 	"wcwidth==0.2.13"
