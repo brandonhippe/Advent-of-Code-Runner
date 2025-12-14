@@ -25,17 +25,12 @@ class AnswerTracker(DataTracker):
     Track answer data
     """
 
-    # types: Dict[type, int] = field(default_factory=lambda: defaultdict(int))
-
     def add_data(self, key: Tuple[Hashable], *args, new_data: Any, incorrect: bool=False, **kwargs) -> None:
         super().add_data(key, *args, new_data=new_data, **kwargs)
         if incorrect:
             if "incorrect" not in self.data:
                 self.data["incorrect"] = type(self)(False)
             self.data["incorrect"].add_data((key,), new_data=new_data)
-        
-        # if len(key) == 1 and key[0] not in self.types:
-        #     self.types[key[0]] = type(new_data).__name__
     
     def update(self):
         """
@@ -43,12 +38,6 @@ class AnswerTracker(DataTracker):
         """
         for k, ans in self.data.items():
             if isinstance(ans, type(self)):
-                # for t, count in ans.types.items():
-                #     if isinstance(count, int):
-                #         self.types[t] += count
-                #     else:
-                #         self.types[count] += 1
-
                 continue
 
             if not isinstance(ans, str):
@@ -265,8 +254,8 @@ class AnswerLogger(Logger):
         incorrect = False
         self.data.add_data((lang, year, day, part), new_data=ans)
         
-        if (day, part) != (25, 2) and ans != "":
-            if (year, day, part) not in self.correct and (day, part) != (25, 2):
+        if ans != "" and not ((year < 2025 and (day, part) == (25, 2)) or (year >= 2025 and (day, part) == (12, 2))):
+            if (year, day, part) not in self.correct:
                 new_answers = get_answers(year, day)
                 
                 if part in new_answers or submit_answer(year, day, part, ans):
@@ -275,7 +264,7 @@ class AnswerLogger(Logger):
                 else:
                     self.data.add_data((lang, year, day, part), new_data=ans, incorrect=True)
                     incorrect = True
-            elif ans != self.correct[year, day, part]:
+            elif str(ans) != str(self.correct[year, day, part]):
                 self.data.add_data((lang, year, day, part), new_data=ans, incorrect=True)
                 incorrect = True
 
