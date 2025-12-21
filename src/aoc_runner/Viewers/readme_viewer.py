@@ -208,6 +208,7 @@ class ReadmeViewer(Viewer):
         tile_maker.aoc_tiles_dir = Path(readme_path.parent, ".tiles", str(lang))
         tile_maker.image_dir = Path(tile_maker.aoc_tiles_dir, "images")
         tile_maker.what_to_show_on_right_side = "runtime"
+        tile_maker.count_as_solved_when = "either"
         tile_str = tile_maker(*args, years=[year], languages=[lang], solutions_by_year=lang_data, readme_path=readme_path, **kwargs)
         return tile_str
     
@@ -229,6 +230,7 @@ class ReadmeViewer(Viewer):
         tile_maker = TileMaker(**vars(self.args))
         tile_maker.aoc_tiles_dir = Path(readme_path.parent, ".tiles")
         tile_maker.image_dir = Path(tile_maker.aoc_tiles_dir, "images")
+        tile_maker.count_as_solved_when = "either"
         tile_str = tile_maker(*args, years=[year], languages=lang_list, solutions_by_year=lang_data, readme_path=readme_path, **kwargs)
         return tile_str
     
