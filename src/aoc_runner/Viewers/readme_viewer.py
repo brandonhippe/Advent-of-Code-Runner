@@ -101,7 +101,7 @@ class ReadmeViewer(Viewer):
         
         for lang in LANGS:
             for (year, day), part in product(lang.ran, [1, 2]):
-                if (day, part) == (25, 2) or (year, day, part) in self.incorrect:
+                if (year < 2025 and (day, part) == (25, 2)) or (year >= 2025 and (day, part) == (12, 2)) or (year, day, part) in self.incorrect:
                     continue
 
                 year_stars[year][lang] += 1
@@ -109,14 +109,14 @@ class ReadmeViewer(Viewer):
         total_stars = 0
         for year, year_data in year_stars.items():
             year_stars = max(year_data.values())
-            if year_stars == 49:
+            if year_stars == (49 if year < 2025 else 23):
                 year_stars += 1
 
             total_stars += year_stars
 
             self.print(f"Writing {year} README(s)")
             for lang, lang_year_stars in year_data.items():
-                if lang_year_stars == 49:
+                if lang_year_stars == (49 if year < 2025 else 23):
                     lang_year_stars += 1
 
                 lang_title = str(lang).title()

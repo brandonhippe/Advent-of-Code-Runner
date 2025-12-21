@@ -10,8 +10,8 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "cwd":"/home/brandonhippe/Advent-of-Code",
-            "args": ["-r", "-a", "--readme", "-l", "rust"]
+            "cwd":"${workspaceFolder}/../Advent-of-Code",
+            "args": ["-r", "-a", "--readme", "-l", "rust", "-y", "2025"]
         },
     ]
 }
