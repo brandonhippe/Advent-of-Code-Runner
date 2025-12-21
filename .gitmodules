@@ -1,3 +1,4 @@
 [submodule "src/aoc_runner/Viewers/tiles"]
 	path = src/aoc_runner/Viewers/tiles
 	url = https://github.com/brandonhippe/aoc_runner_tiles.git
+	branch = main
